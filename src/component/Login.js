@@ -1,39 +1,37 @@
-import React, {useEffect, useState} from 'react';
-import {Base_Url} from "../constants";
+import React, { useState } from 'react';
+import { Base_Url } from "../constants"; // API URL
 import axios from "axios";
-import '../css/Login.css'
+import '../css/Login.css';
 
 function Login(props) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [err, setErr] = useState("")
+    const [err, setErr] = useState("");
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        if (localStorage.getItem("Token") !== null) {
-            window.location.href = "/logout";
-        }
-    }, []);
-
+    // Handler for username input
     function usernameChangeHandler(event) {
         setUsername(event.target.value);
     }
 
+    // Handler for password input
     function passwordChangeHandler(event) {
         setPassword(event.target.value);
     }
 
+    // Login function
     function login() {
         setLoading(true);
-        let data = JSON.stringify({
-            "username": username,
-            "password": password
+
+        // Prepare data to send to the backend
+        const data = JSON.stringify({
+            username: username,
+            password: password
         });
 
-        let config = {
+        const config = {
             method: 'post',
-            maxBodyLength: Infinity,
-            url: Base_Url+'/api/login/',
+            url: `${Base_Url}/api/login/`, // API endpoint for login
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -42,17 +40,38 @@ function Login(props) {
 
         axios.request(config)
             .then((response) => {
-                console.log(JSON.stringify(response.data));
-                localStorage.setItem("Token", response.data.token);
-                setErr("Login success");
-                setLoading(false);
+                console.log("Response Data:", JSON.stringify(response.data));
+
+                // Check the response structure and handle accordingly
+                if (response.data.token && response.data.user_id) {
+                    localStorage.setItem("Token", response.data.token);
+                    localStorage.setItem("user_id", response.data.user_id);  // Correct field name
+                    setErr("Login success");
+                    setLoading(false);
+                    window.location.href = "/view";  // Redirect after login
+                } else {
+                    setErr("Unexpected response structure. Please check the response format.");
+                    setLoading(false);
+                }
             })
             .catch((error) => {
-                console.log(error);
-                setErr(error.response.data);
+                // Enhanced error logging
+                if (error.response) {
+                    // If the error is due to a bad response from the server
+                    console.log("Error Response:", error.response);
+                    setErr(error.response.data ? error.response.data : "Something went wrong with the request.");
+                } else if (error.request) {
+                    // If no response was received
+                    console.log("Error Request:", error.request);
+                    setErr("No response received. Please check your network or API server.");
+                } else {
+                    // For any other errors (e.g., setup issues)
+                    console.log("Error Message:", error.message);
+                    setErr("An unexpected error occurred.");
+                }
+
                 setLoading(false);
             });
-
     }
 
     return (

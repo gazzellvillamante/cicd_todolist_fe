@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import Home from "./Home";
 import {Base_Url} from "../constants";
 import axios from "axios";
 import '../css/Register.css'
@@ -24,44 +23,51 @@ function Register(props) {
     }
 
     function register() {
-        if (username === "" || email === "" || password === "") {
-            setErr("Please enter all fields");
-        } else {
-            setLoading(true);
-            let data = JSON.stringify({
-              "username": username,
-              "email": email,
-              "password": password
-            });
+    if (username === "" || email === "" || password === "") {
+        setErr("Please enter all fields");
+    } else {
+        setLoading(true);
+        let data = JSON.stringify({
+            "username": username,
+            "email": email,
+            "password": password
+        });
 
-            let config = {
-              method: 'post',
-              maxBodyLength: Infinity,
-              url: Base_Url+'/api/register/',
-              headers: {
+        let config = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: Base_Url+'/api/register/',
+            headers: {
                 'Content-Type': 'application/json'
-              },
-              data : data
-            };
+            },
+            data : data
+        };
 
-            axios.request(config)
+        axios.request(config)
             .then((response) => {
-              console.log(JSON.stringify(response.data));
-              setErr("Register success")
+                console.log(JSON.stringify(response.data));
+                setErr("Register success");
                 setLoading(false);
             })
             .catch((error) => {
-              console.log(error);
-              setErr((error.response.data))
+                console.log(error);
+                // Handle non_field_errors or other errors
+                if (error.response && error.response.data) {
+                    if (error.response.data.non_field_errors) {
+                        setErr(error.response.data.non_field_errors.join(", ")); // Join the errors if it's an array
+                    } else {
+                        setErr(error.response.data.detail || "An error occurred during registration.");
+                    }
+                } else {
+                    setErr("An unexpected error occurred.");
+                }
                 setLoading(false);
             });
-        }
-
     }
+}
 
     return (
         <div className="register-container">
-            <Home />
             <h1>Register</h1>
             <div className="form-group">
                 <input
