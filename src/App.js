@@ -5,7 +5,6 @@ import View from "./component/View";
 import Home from "./component/Home";
 import Register from "./component/Register";
 import Login from "./component/Login";
-import Logout from "./component/Logout";
 
 
 function App() {
@@ -18,7 +17,6 @@ function App() {
                     <Route path="/login" element={<Login/>} />
                     <Route path="/create" element={<Create />} />
                     <Route path="/view" element={<View />} />
-                    <Route path="/logout" element={<Logout/>} />
                 </Routes>
             </BrowserRouter>
         </div>
