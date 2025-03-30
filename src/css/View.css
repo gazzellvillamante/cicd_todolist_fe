@@ -50,11 +50,11 @@ button:focus {
 }
 
 button:last-child {
-    background-color: #f44336;
+    background-color: #367E7F;
 }
 
 button:last-child:hover {
-    background-color: #e53935;
+    background-color: #3C8B8C;
 }
 
 .error-message {
